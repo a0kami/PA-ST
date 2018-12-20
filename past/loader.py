@@ -5,6 +5,7 @@ print("\"Loader\" module import successful")
 # Imports
 import argparse
 import json
+from enum import Enum
 
 class argHandler:
     args = {}
@@ -58,6 +59,10 @@ class argHandler:
         if self.args.img != None:
             print("Image path:", self.args.img)
 
+# File Type Enum
+class EFileType(Enum):
+    DATA = 0
+    REQUEST = 1
 
 class trajectoryFilesHandler:
     # Dictionary of key: "file path", value: javascript object
@@ -66,30 +71,40 @@ class trajectoryFilesHandler:
     # implicit __init__()
     # TODO: Trajectory files path getter
 
-    def addFile(self, pathList):
+    def addFile(self, pathList, fileType):
         # If pathList is a list and handle each file
         if type(pathList) == list:
             for path in pathList:
-                self.handleFile(path)
+                self.handleFile(path, fileType)
 
         # Else it's a path
         elif type(pathList) == str:
-            data = self.handleFile(pathList)
+            data = self.handleFile(pathList, fileType)
 
         elif pathList == None:
             print("No path provided")
 
 
-    def handleFile(self, path):
+    def handleFile(self, path, fileType):
         if(path not in self.filesDict):
             self.filesDict[path] = {}
         with open(path) as jsonIn:
             # Load raw javascript objects list
             rawJSON = json.loads(jsonIn.read())
-            # For each object, put in the dictionary with key "id" and the object as value
-            # TODO: flatten dictionnary to get rid of object "id" key because already dictionnary key
-            for i in range(len(rawJSON)):
-                id = rawJSON[i]["id"]
-                # Getting rid of javascript object "id" key as it's already the python dictionary key
-                rawJSON[i].pop('id')
-                self.filesDict[path][id] = rawJSON[i]
+
+            if(fileType == EFileType.DATA):
+                # For each object, put in the dictionary with key "path" and the object as value
+                for i in range(len(rawJSON)):
+                    id = rawJSON[i]["id"]
+                    # Getting rid of javascript object "id" key as it's already the python dictionary key
+                    rawJSON[i].pop('id')
+                    self.filesDict[path][id] = rawJSON[i]
+
+            elif(fileType == EFileType.REQUEST):
+                # For each object, put in the dictionary with key "path" and the object as value
+                for i in range(len(rawJSON)):
+                    # Adding track key to match the trajectory data
+                    self.filesDict[path][i] = {"track": rawJSON[i]}
+
+            else:
+                print("".join(["Unrecognized file type for: \"", path, "\""]))
