@@ -1,15 +1,15 @@
 # coding: utf-8
 
-print("\"Loader\" module imported")
+print("\"Loader\" module import successful")
 
 # Imports
 import argparse
 import json
 
-class argHandle:
+class argHandler:
     args = {}
     def __init__(self):
-        # Gestion d'arguments
+        # Arguments handling with argparse
         parser = argparse.ArgumentParser()
 
         groupInput = parser.add_mutually_exclusive_group(required=True)
@@ -24,7 +24,7 @@ class argHandle:
                                 nargs = "+",
                                 help = "Chemin du ou des dossiers contenant les fichiers JSON des données de trajectoires")
 
-        # TODO: refactoriser les json pour inclure les requêtes dans un même fichier
+        # TODO: refactor if trajectory data and requests included in same json file
         groupRequest = parser.add_mutually_exclusive_group()
         groupRequest.add_argument("-r",
                                   "--requestFile",
@@ -48,26 +48,48 @@ class argHandle:
         self.args = parser.parse_args()
 
         if self.args.inputFile != None:
-            print("Input files path: ", self.args.inputFile)
+            print("Data files path: ", self.args.inputFile)
         if self.args.inputDir != None:
-            print("Input dir path: ", self.args.inputDir)
+            print("Data dir path: ", self.args.inputDir)
         if self.args.requestFile != None:
-            print("Input files path: ", self.args.requestFile)
+            print("Request files path: ", self.args.requestFile)
         if self.args.requestDir != None:
-            print("Input dir path: ", self.args.requestDir)
+            print("Request dir path: ", self.args.requestDir)
         if self.args.img != None:
             print("Image path:", self.args.img)
 
-class trajectoryList:
-    data = []
-    def __init__(self, pathList):
-        # Si pathList est une liste
+
+class trajectoryFilesHandler:
+    # Dictionary of key: "file path", value: javascript object
+    filesDict = {}
+
+    # implicit __init__()
+    # TODO: Trajectory files path getter
+
+    def addFile(self, pathList):
+        # If pathList is a list and handle each file
         if type(pathList) == list:
             for path in pathList:
-                # TODO: gérer plusieurs listes
-                with open(path) as jsonIn:
-                    self.data = json.loads(jsonIn.read())
+                self.handleFile(path)
 
-        # Sinon c'est un chemin
+        # Else it's a path
+        elif type(pathList) == str:
+            data = self.handleFile(pathList)
+
+        elif pathList == None:
+            print("No path provided")
+
+
+    def handleFile(self, path):
+        if(path not in self.filesDict):
+            self.filesDict[path] = {}
         with open(path) as jsonIn:
-            self.data = json.loads(jsonIn.read())
+            # Load raw javascript objects list
+            rawJSON = json.loads(jsonIn.read())
+            # For each object, put in the dictionary with key "id" and the object as value
+            # TODO: flatten dictionnary to get rid of object "id" key because already dictionnary key
+            for i in range(len(rawJSON)):
+                id = rawJSON[i]["id"]
+                # Getting rid of javascript object "id" key as it's already the python dictionary key
+                rawJSON[i].pop('id')
+                self.filesDict[path][id] = rawJSON[i]

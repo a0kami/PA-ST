@@ -2,9 +2,18 @@
 # coding: utf-8
 
 import past.loader
-import past.dtw
+import past.comparison
 
-# Gestion des arguments
-argHandle = past.loader.argHandle()
-trajectoryList = past.loader.trajectoryList(argHandle.args.inputFile)
-past.dtw.dtw(trajectoryList.data, 0)
+# Arguments handler
+argHandle = past.loader.argHandler()
+
+# New files handler
+filesHandler = past.loader.trajectoryFilesHandler()
+filesHandler.addFile(argHandle.args.inputFile)
+filesHandler.addFile(argHandle.args.requestFile)
+
+# Make comparison
+files = list(filesHandler.filesDict.keys())
+comparison = past.comparison.comparison(filesHandler.filesDict[files[0]])
+comparison.compare(0, True)
+comparison.printScore(0)
