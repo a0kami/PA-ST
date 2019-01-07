@@ -26,6 +26,7 @@ private:
     Ui::MainWindow *ui;
     void paintEvent(QPaintEvent *event);
 
+    QImage image;
     Json::Value queries;
     Json::Value trajectoires;
     std::vector<std::vector<float>> distances;

@@ -32,6 +32,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    QString url = "data/img/camera2.png";
+    image = QImage(url,"PNM");
+
     /*
     Format query :
     [int][int]["x"|"y"]
@@ -90,6 +93,10 @@ void MainWindow::paintEvent(QPaintEvent *event) {
             dist = distances[sldval][i];
         }
     }
+
+    //draw le picture
+    painter.drawImage(QRect(20 * this->width() / 1000, 20 * this->height() / 660,
+                            this->width()-(40 * this->width() / 1000), this->height()-(120 * this->height() / 660)), image);
 
     //affichage des trajectoires
     //Les x sont compris dans [0, 960] et les y dans [0, 540].
