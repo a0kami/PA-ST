@@ -76,6 +76,8 @@ MainWindow::~MainWindow()
 void MainWindow::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     int px, py;
+    int circleSize = 10;
+    int squareSize = 8; //pls make this even ty (because I divide it by 2 ok)
     uint sldval = ui->horizontalSlider->value();
     //painter.drawLine(this->width() * 0.1, this->height() * 0.9, this->width() * 0.9, this->height() * 0.1);
 
@@ -107,12 +109,19 @@ void MainWindow::paintEvent(QPaintEvent *event) {
                 painter.drawLine(x1, y1, x2, y2);
             }
             //point sur le debut de la trajectoire
-            painter.setPen(QPen(QColor(180,220,220), 12, Qt::DashLine, Qt::RoundCap));
+            painter.setPen(QPen(QColor(180,220,220), circleSize, Qt::DashLine, Qt::RoundCap));
             px = trajectoires[i]["track"][0]["x"].asInt();
             px = (px + 20) * this->width() / 1000;
             py = trajectoires[i]["track"][0]["y"].asInt();
             py = (py + 20) * this->height() / 660;
             painter.drawPoint(px,py);
+            //square at the end
+            painter.setPen(QPen(QColor(180,220,220), 2, Qt::SolidLine, Qt::RoundCap));
+            px = trajectoires[i]["track"][trajectoires[i]["track"].size()-1]["x"].asInt();
+            px = (px + 20) * this->width() / 1000;
+            py = trajectoires[i]["track"][trajectoires[i]["track"].size()-1]["y"].asInt();
+            py = (py + 20) * this->height() / 660;
+            painter.drawRect(px-squareSize/2,py-squareSize/2,squareSize,squareSize);
         }
     }
 
@@ -131,12 +140,19 @@ void MainWindow::paintEvent(QPaintEvent *event) {
         painter.drawLine(x1, y1, x2, y2);
     }
     //point sur le debut de la trajectoire
-    painter.setPen(QPen(QColor(0,150,150), 12, Qt::DashLine, Qt::RoundCap));
+    painter.setPen(QPen(QColor(0,150,150), circleSize, Qt::DashLine, Qt::RoundCap));
     px = trajectoires[ind]["track"][0]["x"].asInt();
     px = (px + 20) * this->width() / 1000;
     py = trajectoires[ind]["track"][0]["y"].asInt();
     py = (py + 20) * this->height() / 660;
     painter.drawPoint(px,py);
+    //square at the end
+    painter.setPen(QPen(QColor(0,150,150), 2, Qt::SolidLine, Qt::RoundCap));
+    px = trajectoires[ind]["track"][trajectoires[ind]["track"].size()-1]["x"].asInt();
+    px = (px + 20) * this->width() / 1000;
+    py = trajectoires[ind]["track"][trajectoires[ind]["track"].size()-1]["y"].asInt();
+    py = (py + 20) * this->height() / 660;
+    painter.drawRect(px-squareSize/2,py-squareSize/2,squareSize,squareSize);
 
     //affichage de la query
     painter.setPen(QPen(QColor(255,0,0), 2, Qt::DashLine, Qt::RoundCap));
@@ -152,12 +168,19 @@ void MainWindow::paintEvent(QPaintEvent *event) {
         painter.drawLine(x1, y1, x2, y2);
     }
     //point sur le debut de la query
-    painter.setPen(QPen(QColor(255,0,0), 12, Qt::DashLine, Qt::RoundCap));
+    painter.setPen(QPen(QColor(255,0,0), circleSize, Qt::DashLine, Qt::RoundCap));
     px = queries[sldval][0]["x"].asInt();
     px = (px + 20) * this->width() / 1000;
     py = queries[sldval][0]["y"].asInt();
     py = (py + 20) * this->height() / 660;
     painter.drawPoint(px,py);
+    //square at the end
+    painter.setPen(QPen(QColor(255,0,0), 2, Qt::SolidLine, Qt::RoundCap));
+    px = queries[sldval][queries[sldval].size()-1]["x"].asInt();
+    px = (px + 20) * this->width() / 1000;
+    py = queries[sldval][queries[sldval].size()-1]["y"].asInt();
+    py = (py + 20) * this->height() / 660;
+    painter.drawRect(px-squareSize/2,py-squareSize/2,squareSize,squareSize);
 }
 
 void MainWindow::on_horizontalSlider_valueChanged(int value) {
