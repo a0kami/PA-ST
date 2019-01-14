@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QPainter>
 
-#include <dist/json/json.h>
+#include <trajdist.h>
 
 
 namespace Ui {

@@ -27,12 +27,14 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    dist/jsoncpp.cpp
+    dist/jsoncpp.cpp \
+    trajdist.cpp
 
 HEADERS += \
         mainwindow.h \
     dist/json/json-forwards.h \
-    dist/json/json.h
+    dist/json/json.h \
+    trajdist.h
 
 FORMS += \
         mainwindow.ui
