@@ -7,5 +7,6 @@
 float distEucl(Json::Value p1, Json::Value p2);
 float dtw_old(Json::Value t1, Json::Value t2);
 float dtw(Json::Value t1, Json::Value t2);
+float sdtw(Json::Value t1, Json::Value t2);
 
 #endif // TRAJDIST_H
