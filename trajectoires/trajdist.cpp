@@ -101,8 +101,13 @@ float distSMID(Json::Value t1, Json::Value t2, int i, int j){
 }
 
 float distMAX(Json::Value t1, Json::Value t2){
-	////TODO
-	return 0;
+	float dmax=0;
+	for(uint i=0; i<t1.size(); i++)
+		for(uint j=0; j<t2.size(); j++){
+			const float d= distEucl(t1[i],t2[j]);
+			if(d>dmax) dmax=d;
+		}
+	return dmax;
 }
 
 float distS(Json::Value t1, Json::Value t2, int i, int j){
