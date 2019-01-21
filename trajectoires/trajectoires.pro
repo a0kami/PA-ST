@@ -28,13 +28,15 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     dist/jsoncpp.cpp \
-    trajdist.cpp
+    trajdist.cpp \
+    displayarea.cpp
 
 HEADERS += \
         mainwindow.h \
     dist/json/json-forwards.h \
     dist/json/json.h \
-    trajdist.h
+    trajdist.h \
+    displayarea.h
 
 FORMS += \
         mainwindow.ui

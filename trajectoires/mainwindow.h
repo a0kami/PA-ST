@@ -20,16 +20,20 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_horizontalSlider_valueChanged(int value);
+    void on_checkBox_img_stateChanged(int arg1);
+
+    void on_checkBox_traj_stateChanged(int arg1);
+
+    void on_comboBox_queries_currentIndexChanged(int index);
 
 private:
     Ui::MainWindow *ui;
-    void paintEvent(QPaintEvent *event);
 
     QImage image;
     Json::Value queries;
     Json::Value trajectoires;
     std::vector<std::vector<float>> distances;
+    bool loading = true;
 
 };
 
