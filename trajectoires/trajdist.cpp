@@ -206,3 +206,132 @@ std::cout<<" mat done"<<std::endl;
     return mat[n-2][m-2];
 
 }
+
+/**
+ * @brief hausdorffComponent
+ * @param a Ensemble 1
+ * @param b Ensemble 2
+ * @return La composant a vers b de la distance d'hausdorff
+ */
+float hausdorffComponent(Json::Value a, Json::Value b){
+
+    // Stockage de la Distance (float), type de primitive la plus proche (char: 's' segment ou 'p' point), id de la primitive (uint id-ième point ou segment)
+    // Pour chaque sommet
+    std::vector<float> distanceA;
+    std::vector<char> typeDistanceA;
+    std::vector<uint> idDistanceA;
+    // Pour un sommet donné, garde en mémoire pour chaque segment de B
+    std::vector<float> distanceSommetA;
+    std::vector<char> typeDistanceSommetA;
+    std::vector<uint> idDistanceSommetA;
+
+    // 1. Distances des sommets de a vers polyligne b
+    // Pour chaque sommet de a
+    for(uint sommetA = 0; sommetA < a.size(); ++sommetA){
+        // Reset
+        distanceSommetA.clear();
+        typeDistanceSommetA.clear();
+        idDistanceSommetA.clear();
+
+        // Pour chaque segment de b
+        for(uint sommetB = 1; sommetB < b.size(); ++sommetB){
+            // Calcul des vecteurs
+            std::vector<float> b1a1 = {a[sommetA]["x"].asFloat() - a[sommetB-1]["x"].asFloat(), a[sommetA]["y"].asFloat() - a[sommetB-1]["y"].asFloat()};
+            std::vector<float> b2a1 = {a[sommetA]["x"].asFloat() - a[sommetB]["x"].asFloat(), a[sommetA]["y"].asFloat() - a[sommetB]["y"].asFloat()};
+            std::vector<float> b1b2 = {a[sommetB]["x"].asFloat() - a[sommetB-1]["x"].asFloat(), a[sommetB]["y"].asFloat() - a[sommetB-1]["y"].asFloat()};
+            // Normalisation ?
+
+            // Vérification sommetA dans la bande orthogonale au segment sommetB-1, sommetB
+            float produitScalaireBandeGauche = b1a1[0] * b1b2[0] + b1a1[1] * b1b2[1];
+            float produitScalaireBandeDroite  = b2a1[0] * b1b2[0] + b2a1[1] * b1b2[1];
+            //std::cout << bandeGauche << std::endl << bandeDroite << std::endl << std::endl;
+
+            // Si les 2 produits scalaires sont supérieures à 0, distance = produit scalaire entre b1a1 et vecteur orthogonal unitaire
+            if(produitScalaireBandeGauche >= 0 && produitScalaireBandeDroite >= 0) {
+                std::vector<float> vecteurOrthoUnit = {-(b[sommetB]["y"].asFloat() - b[sommetB-1]["y"].asFloat()), b[sommetB]["x"].asFloat() - b[sommetB-1]["x"].asFloat()};
+                float normeVecteurOrthoUnit = sqrt(pow(vecteurOrthoUnit[0], 2) + pow(vecteurOrthoUnit[1], 2));
+                vecteurOrthoUnit[0] = vecteurOrthoUnit[0] / normeVecteurOrthoUnit;
+                vecteurOrthoUnit[1] = vecteurOrthoUnit[1] / normeVecteurOrthoUnit;
+
+                // Push dans sommetA
+                distanceSommetA.push_back(b1a1[0] * vecteurOrthoUnit[0] + b1a1[1] * vecteurOrthoUnit[1]);
+                typeDistanceSommetA.push_back('s');
+                idDistanceSommetA.push_back(sommetB-1);
+            }
+            // Sinon distance = distance euclidienne du sommet de B le plus proche
+            else {
+                float distance1 = distEucl(a[sommetA], b[sommetB-1]);
+                float distance2 = distEucl(a[sommetA], b[sommetB]);
+                if(distance1 <= distance2) {
+                    distanceSommetA.push_back(distance1);
+                    idDistanceSommetA.push_back(sommetB-1);
+                }
+                else {
+                    distanceSommetA.push_back(distance2);
+                    idDistanceSommetA.push_back(sommetB);
+                }
+                typeDistanceSommetA.push_back('p');
+            }
+        }
+
+        // La plus petite distance est la distance euclidienne de sommetA à la polyligne b
+        distanceA.push_back(distanceSommetA[0]);
+        typeDistanceA.push_back(typeDistanceSommetA[0]);
+        idDistanceA.push_back(idDistanceSommetA[0]);
+        for(uint i = 0; i < distanceSommetA.size(); ++i) {
+            if(distanceSommetA[i] < distanceA[sommetA]) {
+                distanceA[sommetA] = distanceSommetA[i];
+                typeDistanceA[sommetA] = typeDistanceSommetA[i];
+                idDistanceA[sommetA] = idDistanceSommetA[i];
+            }
+        }
+    }
+
+    // 2. Élimination d'analyse complémentaire pour chaque segment de a
+    std::vector<bool> analyseSup;
+    for(uint sommetA = 1; sommetA < a.size(); ++sommetA){
+        analyseSup.push_back(
+            ((typeDistanceA[sommetA-1] == typeDistanceA[sommetA])
+             &&
+             (idDistanceA[sommetA-1] == idDistanceA[sommetA]))
+            ||
+            (((typeDistanceA[sommetA-1] == 'p')
+             &&
+             (typeDistanceA[sommetA] == 'p'))
+             &&
+             (abs((int) idDistanceSommetA[sommetA-1] - (int)idDistanceA[sommetA]) == 0))
+        );
+    }
+
+    // Valeur retournée : Distance max des distances min de chaque sommet
+    float maxDistance = distanceA[0];
+    for(uint i = 1; i < distanceA.size(); ++i) {
+        if(distanceA[i] > maxDistance) {
+            maxDistance = distanceA[i];
+        }
+    }
+
+    return maxDistance;
+
+    // TODO:
+    // 3. Analyse complémentaire
+    for(auto value: analyseSup) {
+        std::cout << value << std::endl;
+    }
+
+}
+
+/**
+ * @brief hausdorff
+ * @param q Trajectoire requête
+ * @param t Trajectoire testée
+ * @return Distance de hausdorff entre q et t
+ */
+float hausdorff(Json::Value q, Json::Value t){
+    // Calcule les 2 composants de la distance d'hausdorff
+    float c1 = hausdorffComponent(q, t);
+    float c2 = hausdorffComponent(t, q);
+
+    // Renvoie le maximum de des 2 composants D(q->t), D(t->q)
+    return fmax(c1, c2);
+}

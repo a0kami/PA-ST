@@ -27,6 +27,8 @@ private slots:
     
     void on_comboBox_distance_currentIndexChanged(int index);
 
+    void on_query_added();
+
 private:
     Ui::MainWindow *ui;
 

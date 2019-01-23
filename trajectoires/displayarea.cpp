@@ -1,5 +1,8 @@
 #include "displayarea.h"
 
+#include <iostream>
+#include <cmath>
+
 DisplayArea::DisplayArea(QWidget *parent) : QFrame(parent) {
 
 }
@@ -138,4 +141,69 @@ void DisplayArea::paintEvent(QPaintEvent *event) {
     py = (*queries)[currentQuery][(*queries)[currentQuery].size()-1]["y"].asInt();
     py = py * this->height() / image->height();
     painter.drawRect(px-squareSize/2,py-squareSize/2,squareSize,squareSize);
+
+
+    //affichage le drawing
+    painter.setPen(QPen(QColor(139,0,139), 2, Qt::DashLine, Qt::RoundCap));
+    for(uint j = 1 ; j < drawing.size(); j++) {
+        int x1 = drawing[j-1].x;
+        int x2 = drawing[j].x;
+        int y1 = drawing[j-1].y;
+        int y2 = drawing[j].y;
+        x1 = x1 * this->width() / image->width();
+        x2 = x2 * this->width() / image->width();
+        y1 = y1 * this->height() / image->height();
+        y2 = y2 * this->height() / image->height();
+        //painter.drawPoint(x1, y1);
+        painter.drawLine(x1, y1, x2, y2);
+    }
+}
+
+void DisplayArea::mousePressEvent(QMouseEvent *event)
+{
+    isDrawing = true;
+    drawing.clear();
+    drawing.push_back({event->x() * image->width() / this->width(),
+                       event->y() * image->height() / this->height()});
+}
+
+void DisplayArea::mouseMoveEvent(QMouseEvent *event)
+{
+    if(!isDrawing)
+        return;
+
+    Pt lpt = drawing[drawing.size()-1];
+    Pt curpt = {event->x() * image->width() / this->width(),
+                  event->y() * image->height() / this->height()};
+
+    if( pow((lpt.x - curpt.x), 2) + pow((lpt.y - curpt.y), 2) < drawstep)
+        return;
+
+    drawing.push_back(curpt);
+    this->update();
+}
+
+void DisplayArea::mouseReleaseEvent(QMouseEvent *event)
+{
+    //do stuff here
+    isDrawing = false;
+    drawing.push_back({event->x() * image->width() / this->width(),
+                       event->y() * image->height() / this->height()});
+
+    Json::Value query(Json::arrayValue);
+    for(int i = 0; i < drawing.size(); i++) {
+        Json::Value point;
+        point["x"] = drawing[i].x;
+        point["y"] = drawing[i].y;
+        query.append(point);
+    }
+    for(int i = 0; i < query.size(); i++) {
+        std::cout << query[i]["x"] << " " << query[i]["y"] << std::endl;
+    }
+
+    drawing.clear();
+
+    (*queries).append(query);
+    emit query_added();
+    this->update();
 }

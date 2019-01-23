@@ -3,8 +3,14 @@
 
 #include <QFrame>
 #include <QPainter>
+#include <QMouseEvent>
 
 #include <dist/json/json.h>
+
+struct Pt {
+    int x;
+    int y;
+};
 
 class DisplayArea : public QFrame {
 Q_OBJECT
@@ -16,6 +22,9 @@ public:
     void setDrawImage(bool value);
     void setDrawDistTraj(bool value);
 
+signals:
+    void query_added();
+
 private:
     QImage* image = nullptr;
     Json::Value* queries = nullptr;
@@ -26,6 +35,14 @@ private:
     bool drawDistTraj = true;
 
     void paintEvent(QPaintEvent *event);
+
+    bool isDrawing = false;
+    std::vector<Pt> drawing;
+    double drawstep = 60*60;
+
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 };
 
 #endif // DISPLAYAREA_H
