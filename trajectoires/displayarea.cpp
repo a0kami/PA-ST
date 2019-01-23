@@ -197,9 +197,9 @@ void DisplayArea::mouseReleaseEvent(QMouseEvent *event)
         point["y"] = drawing[i].y;
         query.append(point);
     }
-    for(int i = 0; i < query.size(); i++) {
-        std::cout << query[i]["x"] << " " << query[i]["y"] << std::endl;
-    }
+    //for(int i = 0; i < query.size(); i++) {
+    //    std::cout << query[i]["x"] << " " << query[i]["y"] << std::endl;
+    //}
 
     drawing.clear();
 

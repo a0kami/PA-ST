@@ -39,7 +39,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // mesure des distances
     for(uint j = 0 ; j < trajectoires.size(); j++) {
         distances.push_back(calcDist(queries[0], trajectoires[j]["track"]));
-        //std::cout << "distance entre q" << 0 << " et t" << j << " : " << distances[i][j] << std::endl;
     }
 
     loading = false;
@@ -122,7 +121,6 @@ void MainWindow::on_comboBox_distance_currentIndexChanged(int index)
 
 void MainWindow::on_query_added()
 {
-    //std::cout << "query added" << std::endl;
     ui->comboBox_queries->addItem(QString::number(ui->comboBox_queries->count()));
     ui->comboBox_queries->setCurrentIndex(ui->comboBox_queries->count()-1);
     on_comboBox_queries_currentIndexChanged(ui->comboBox_queries->count()-1);

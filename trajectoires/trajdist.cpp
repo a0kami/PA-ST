@@ -7,7 +7,6 @@ float distEucl(Json::Value p1, Json::Value p2) {
 float dtw_old(Json::Value t1, Json::Value t2) {
     //initialisation du tableau
     std::vector<std::vector<float>> dist(t1.size()+1, std::vector<float>(t2.size()+1, 0));
-    //std::cout << "dimention du tableau : [" << dist.size() << "," << dist[0].size() << "]" << std::endl;
 
     for(uint x = 1 ; x < t1.size()+1; x++) {
         for(uint y = 1 ; y < t2.size()+1; y++) {
@@ -28,7 +27,6 @@ float dtw(Json::Value t1, Json::Value t2) {
     for(uint y = 1 ; y < t2.size()+1; y++) {
         dist[0][y] = MAXFLOAT;
     }
-    //std::cout << "dimention du tableau : [" << dist.size() << "," << dist[0].size() << "]" << std::endl;
 
     for(uint x = 1 ; x < t1.size()+1; x++) {
         for(uint y = 1 ; y < t2.size()+1; y++) {
@@ -53,7 +51,7 @@ float distPointSegment(float x1, float y1, float x2, float y2, float x3, float y
 		return dist(x1,x3,y1,y3);
 	const float dx= x2+(x3-x2)*(r/Lseg);
 	const float dy= y2+(y3-y2)*(r/Lseg);
-	return dist(x1,dx,y2,dy);
+	return dist(x1,y2,dx,dy);
 }
 
 float distPS(Json::Value t1, Json::Value t2, int i, int j){
@@ -154,7 +152,6 @@ float gauss_kernel(float D){
 #include <limits>
 #include <iostream>
 /*float sdtw(Json::Value t1, Json::Value t2){
-    //std::cout << t1.size() << ' ' << t2.size() << std::endl;
     if(t1.size()<=1 && t2.size()<=1){ return 0; }
     if(t1.size()<=1 || t2.size()<=1){return std::numeric_limits<float>::max();}
 
@@ -162,9 +159,10 @@ float gauss_kernel(float D){
 	Json::Value restT2= t2;
 
 	restT1.removeIndex(0,nullptr);
-
 	restT2.removeIndex(0,nullptr);
 
+    a++;
+    
     return distS(t1, t2, 0, 0,0) + std::min(std::min(
 		sdtw(t1, restT2),
 		sdtw(t2, restT1)),
@@ -174,7 +172,6 @@ float gauss_kernel(float D){
 float sdtw(Json::Value t1,Json::Value t2){
     long n = t1.size(), m = t2.size();
 
-    std::cout<<"starting distS"<<std::endl;
     std::vector<std::vector<float>>  dists;
     float Max = distMAX(t1,t2);
     for(int i=0; i<n-1;++i){
@@ -184,8 +181,6 @@ float sdtw(Json::Value t1,Json::Value t2){
         }
         dists.push_back(row);
     }
-     std::cout<<"distS done"<<std::endl;
-      std::cout<<"starting init mat"<<std::endl;
     std::vector<std::vector<float>>  mat;
 
     for(int i=0; i<n;++i){
@@ -195,16 +190,12 @@ float sdtw(Json::Value t1,Json::Value t2){
         }
         mat.push_back(row);
     }
-std::cout<<"init mat done"<<std::endl;
-  std::cout<<"starting  mat"<<std::endl;
     for(int i=1; i<n-1;++i){
         for(int j=1; j<m-1;++j){
             mat[i][j]= dists[i][j] +std::min(mat[i-1][j-1],std::min(mat[i-1][j],mat[i][j-1]));
         }
     }
-std::cout<<" mat done"<<std::endl;
     return mat[n-2][m-2];
-
 }
 
 /**
@@ -244,7 +235,6 @@ float hausdorffComponent(Json::Value a, Json::Value b){
             // Vérification sommetA dans la bande orthogonale au segment sommetB-1, sommetB
             float produitScalaireBandeGauche = b1a1[0] * b1b2[0] + b1a1[1] * b1b2[1];
             float produitScalaireBandeDroite  = b2a1[0] * b1b2[0] + b2a1[1] * b1b2[1];
-            //std::cout << bandeGauche << std::endl << bandeDroite << std::endl << std::endl;
 
             // Si les 2 produits scalaires sont supérieures à 0, distance = produit scalaire entre b1a1 et vecteur orthogonal unitaire
             if(produitScalaireBandeGauche >= 0 && produitScalaireBandeDroite >= 0) {
@@ -316,7 +306,7 @@ float hausdorffComponent(Json::Value a, Json::Value b){
     // TODO:
     // 3. Analyse complémentaire
     for(auto value: analyseSup) {
-        std::cout << value << std::endl;
+    //    std::cout << value << std::endl;
     }
 
 }
