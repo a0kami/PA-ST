@@ -4,7 +4,7 @@ DisplayArea::DisplayArea(QWidget *parent) : QFrame(parent) {
 
 }
 
-void DisplayArea::setData(QImage *imageP, Json::Value *queriesP, Json::Value *trajectoiresP, std::vector<std::vector<float> > *distancesP) {
+void DisplayArea::setData(QImage *imageP, Json::Value *queriesP, Json::Value *trajectoiresP, std::vector<float> *distancesP) {
     image = imageP;
     queries = queriesP;
     trajectoires = trajectoiresP;
@@ -34,11 +34,11 @@ void DisplayArea::paintEvent(QPaintEvent *event) {
 
     //calcul de la trajectoire avec la plus petite distance
     uint ind = 0;
-    float dist = (*distances)[currentQuery][0];
-    for(uint i = 1 ; i < (*distances)[currentQuery].size(); i++) {
-        if(dist > (*distances)[currentQuery][i]) {
+    float dist = (*distances)[0];
+    for(uint i = 1 ; i < (*distances).size(); i++) {
+        if(dist > (*distances)[i]) {
             ind = i;
-            dist = (*distances)[currentQuery][i];
+            dist = (*distances)[i];
         }
     }
 

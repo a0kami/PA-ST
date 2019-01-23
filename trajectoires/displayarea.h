@@ -11,7 +11,7 @@ Q_OBJECT
 public:
     explicit DisplayArea(QWidget *parent = nullptr);
 
-    void setData(QImage* imageP, Json::Value* queriesP, Json::Value* trajectoiresP, std::vector<std::vector<float>>* distancesP);
+    void setData(QImage* imageP, Json::Value* queriesP, Json::Value* trajectoiresP, std::vector<float>* distancesP);
     void setCurrentQuery(int value);
     void setDrawImage(bool value);
     void setDrawDistTraj(bool value);
@@ -20,7 +20,7 @@ private:
     QImage* image = nullptr;
     Json::Value* queries = nullptr;
     Json::Value* trajectoires = nullptr;
-    std::vector<std::vector<float>>* distances = nullptr;
+    std::vector<float>* distances = nullptr;
     uint currentQuery = 0;
     bool drawImage = true;
     bool drawDistTraj = true;
