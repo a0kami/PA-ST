@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //remplissage de la liste déroulante de queries
     ui->comboBox_queries->clear();
-    for(int i = 0; i < queries.size(); i++) {
+    for(uint i = 0; i < queries.size(); i++) {
         ui->comboBox_queries->addItem(QString::number(i));
     }
 
@@ -70,22 +70,33 @@ void MainWindow::on_comboBox_queries_currentIndexChanged(int index)
     if(loading)
         return;
 
-    // mesure des distances
+    // Mesure des distances
     distances.clear();
     for(uint j = 0 ; j < trajectoires.size(); j++) {
         distances.push_back(calcDist(queries[index], trajectoires[j]["track"]));
     }
 
+    // Mise à jour de l'interface
     ui->frame->setCurrentQuery(index);
 
-    //remplissage de la table des distances
+    // Tri des distances par ordre croissant
+    std::vector<std::pair<float, uint>> distanceRank;
+    for(uint i = 0; i < distances.size(); ++i) {
+        distanceRank.push_back(std::pair<float, uint>(distances[i], i));
+    }
+    std::sort(distanceRank.begin(), distanceRank.end(), [](std::pair<float, uint> a, std::pair<float, uint> b) {
+        return a.first <= b.first;
+    }
+    );
+
+    // Ajout des lignes dans la table
     ui->tableDist->setRowCount(0);
     QStringList labels;
-    for(uint i = 0 ; i < distances.size(); i++) {
+    for(auto distanceItem: distanceRank) {
         labels.append("");
         ui->tableDist->insertRow(ui->tableDist->rowCount());
-        ui->tableDist->setItem(ui->tableDist->rowCount()-1, 0, new QTableWidgetItem("Trajectoire " + QString::number(i)));
-        ui->tableDist->setItem(ui->tableDist->rowCount()-1, 1, new QTableWidgetItem(QString::number(int(distances[i]))));
+        ui->tableDist->setItem(ui->tableDist->rowCount()-1, 0, new QTableWidgetItem("Trajectoire " + QString::number(distanceItem.second)));
+        ui->tableDist->setItem(ui->tableDist->rowCount()-1, 1, new QTableWidgetItem(QString::number(int(distanceItem.first))));
     }
     ui->tableDist->setVerticalHeaderLabels(labels);
 }
