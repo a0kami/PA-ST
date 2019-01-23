@@ -59,10 +59,20 @@ float distPointSegment(float x1, float y1, float x2, float y2, float x3, float y
 
 float distPS(Json::Value t1, Json::Value t2, int i, int j){
 	float mid1[2], mid2[2];
-	mid1[0]=(t2[j-1]["x"].asFloat()+t2[j]["x"].asFloat())/2; // xmid1
-	mid1[1]=(t2[j-1]["y"].asFloat()+t2[j]["y"].asFloat())/2; // ymid1
-	mid2[0]=(t2[j+1]["x"].asFloat()+t2[j]["x"].asFloat())/2; // xmid2
-	mid2[1]=(t2[j+1]["y"].asFloat()+t2[j]["y"].asFloat())/2; // ymid2
+	if(j==0){
+		mid1[0]=t2[j]["x"].asFloat(); // xmid1
+		mid1[1]=t2[j]["y"].asFloat(); // ymid1
+	}else {
+		mid1[0]=(t2[j-1]["x"].asFloat()+t2[j]["x"].asFloat())/2; // xmid1
+		mid1[1]=(t2[j-1]["y"].asFloat()+t2[j]["y"].asFloat())/2; // ymid1
+	}
+	if(j==t2.size()-1){
+		mid2[0]=t2[j]["x"].asFloat(); // xmid2
+		mid2[1]=t2[j]["y"].asFloat(); // ymid2
+	}else {
+		mid2[0]=(t2[j+1]["x"].asFloat()+t2[j]["x"].asFloat())/2; // xmid2
+		mid2[1]=(t2[j+1]["y"].asFloat()+t2[j]["y"].asFloat())/2; // ymid2
+	}
 	return distPointSegment(t1[i]["x"].asFloat(), t1[i]["y"].asFloat(), mid1[0], mid1[1], mid2[0], mid2[1]);
 }
 
@@ -87,8 +97,9 @@ float distT(Json::Value t1, Json::Value t2, int i, int j){
 }
 
 float distST(Json::Value t1, Json::Value t2, int i, int j){
-	const float t= 10.f;
-	return distP(t1,t2,i,j)+t*distT(t1,t2,i,j);
+	/** We do not consider time in the given data*/
+	//const float t= 10.f;
+	return distP(t1,t2,i,j);//+t*distT(t1,t2,i,j);
 }
 
 float distST2(Json::Value t1, Json::Value t2, int i, int j){ // {t1[i] ; t[i+1]} and {t2[j] ; t2[j+1]} are the segments
@@ -96,8 +107,7 @@ float distST2(Json::Value t1, Json::Value t2, int i, int j){ // {t1[i] ; t[i+1]}
 }
 
 float distSMID(Json::Value t1, Json::Value t2, int i, int j){
-	////TODO
-	return 0;
+	return distST2(t1,t2,i,j);
 }
 
 float distMAX(Json::Value t1, Json::Value t2){
@@ -116,20 +126,21 @@ float distS(Json::Value t1, Json::Value t2, int i, int j){
 	            b= std::atan2(t2[j+1]["y"].asFloat()-t2[j]["y"].asFloat(), t2[j+1]["x"].asFloat()-t2[j]["x"].asFloat());
 	const float theta= std::abs(a-b);
 	auto f=[=](float t){
-		return distSMID(t1,t2,i,j)/distMAX(t1,t2)*(omega+t);
+		return (distSMID(t1,t2,i,j)/distMAX(t1,t2))*(omega+t);
 	};
 	return f(theta)*distST2(t1,t2,i,j);
 }
 
 #include <limits>
-
+#include <iostream>
 float sdtw(Json::Value t1, Json::Value t2){
+	//std::cout << t1.size() << ' ' << t2.size() << std::endl;
 	if(t1.size()<=1 && t2.size()<=1) return 0;
 	if(t1.size()<=1 || t2.size()<=1) return std::numeric_limits<float>::max();
 	Json::Value restT1= t1;
 	Json::Value restT2= t2;
-	restT1.removeIndex(0,0);
-	restT2.removeIndex(0,0);
+	restT1.removeIndex(0,nullptr);
+	restT2.removeIndex(0,nullptr);
 	return distS(t1, t2, 0, 0) + std::min(std::min(
 		sdtw(t1, restT2),
 		sdtw(t2, restT1)),

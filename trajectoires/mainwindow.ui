@@ -105,7 +105,12 @@
             <widget class="QComboBox" name="comboBox_distance">
              <item>
               <property name="text">
-               <string>dtw</string>
+               <string>DTW</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>SDTW</string>
               </property>
              </item>
             </widget>
@@ -199,7 +204,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>23</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

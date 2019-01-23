@@ -21,11 +21,10 @@ public:
 
 private slots:
     void on_checkBox_img_stateChanged(int arg1);
-
     void on_checkBox_traj_stateChanged(int arg1);
-
     void on_comboBox_queries_currentIndexChanged(int index);
-
+    //void updateDistTable(const QString&);
+    
 private:
     Ui::MainWindow *ui;
 

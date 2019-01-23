@@ -41,7 +41,8 @@ MainWindow::MainWindow(QWidget *parent) :
     //test symetrie
     std::cout << "distance entre t0 et t1 : " << dtw(trajectoires[0]["track"], trajectoires[1]["track"]) << std::endl;
     std::cout << "distance entre t1 et t0 : " << dtw(trajectoires[1]["track"], trajectoires[0]["track"]) << std::endl;
-
+//  std::cout << "distance entre t0 et t1 : " << sdtw(trajectoires[0]["track"], trajectoires[1]["track"]) << std::endl;
+//  std::cout << "distance entre t1 et t0 : " << sdtw(trajectoires[1]["track"], trajectoires[0]["track"]) << std::endl;
     // mesure des distances
     for(uint i = 0 ; i < queries.size(); i++) {
         distances.push_back(std::vector<float>());
