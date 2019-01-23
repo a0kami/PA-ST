@@ -1,5 +1,4 @@
 #include "trajdist.h"
-
 float distEucl(Json::Value p1, Json::Value p2) {
     return sqrt((p1["x"].asFloat() - p2["x"].asFloat()) * (p1["x"].asFloat() - p2["x"].asFloat())
          + (p1["y"].asFloat() - p2["y"].asFloat()) * (p1["y"].asFloat() - p2["y"].asFloat()));
@@ -107,7 +106,22 @@ float distST2(Json::Value t1, Json::Value t2, int i, int j){ // {t1[i] ; t[i+1]}
 }
 
 float distSMID(Json::Value t1, Json::Value t2, int i, int j){
-	return distST2(t1,t2,i,j);
+    float mid1[2], mid2[2];
+    if(i==t1.size()-1){
+        mid1[0]=t1[i]["x"].asFloat()+t1[i+1]["x"].asFloat(); // xmid1
+        mid1[1]=t1[i]["y"].asFloat()+t1[i+1]["y"].asFloat(); // ymid1
+    }else {
+        mid1[0]=t1[i]["x"].asFloat(); // xmid1
+        mid1[1]=t1[i]["y"].asFloat(); // ymid1
+    }
+    if(j==t2.size()-1){
+        mid2[0]=t2[j]["x"].asFloat()+t2[j+1]["x"].asFloat(); // xmid2
+        mid2[1]=t2[j]["y"].asFloat()+t2[j+1]["y"].asFloat(); // ymid2
+    }else {
+        mid2[0]=t2[j]["x"].asFloat(); // xmid2
+        mid2[1]=t2[j]["y"].asFloat(); // ymid2
+    }
+    return dist(mid1[0],mid1[1],mid2[0],mid2[1]);
 }
 
 float distMAX(Json::Value t1, Json::Value t2){
@@ -120,29 +134,75 @@ float distMAX(Json::Value t1, Json::Value t2){
 	return dmax;
 }
 
-float distS(Json::Value t1, Json::Value t2, int i, int j){
-	const float omega= 1.f;
+float distS(Json::Value t1, Json::Value t2, int i, int j,float Max){
+    const float omega= 1.f;
 	const float a= std::atan2(t1[i+1]["y"].asFloat()-t1[i]["y"].asFloat(), t1[i+1]["x"].asFloat()-t1[i]["x"].asFloat()),
 	            b= std::atan2(t2[j+1]["y"].asFloat()-t2[j]["y"].asFloat(), t2[j+1]["x"].asFloat()-t2[j]["x"].asFloat());
 	const float theta= std::abs(a-b);
 	auto f=[=](float t){
-		return (distSMID(t1,t2,i,j)/distMAX(t1,t2))*(omega+t);
+        //return (distSMID(t1,t2,i,j)/distMAX(t1,t2))*(omega+t);
+        return (distSMID(t1,t2,i,j)/Max)*(omega+t);
 	};
 	return f(theta)*distST2(t1,t2,i,j);
+}
+float gauss_kernel(float D){
+
+    float S = 666;
+    return std::log(-D*D/(2*S*S));
 }
 
 #include <limits>
 #include <iostream>
-float sdtw(Json::Value t1, Json::Value t2){
-	//std::cout << t1.size() << ' ' << t2.size() << std::endl;
-	if(t1.size()<=1 && t2.size()<=1) return 0;
-	if(t1.size()<=1 || t2.size()<=1) return std::numeric_limits<float>::max();
+/*float sdtw(Json::Value t1, Json::Value t2){
+    //std::cout << t1.size() << ' ' << t2.size() << std::endl;
+    if(t1.size()<=1 && t2.size()<=1){ return 0; }
+    if(t1.size()<=1 || t2.size()<=1){return std::numeric_limits<float>::max();}
+
 	Json::Value restT1= t1;
 	Json::Value restT2= t2;
+
 	restT1.removeIndex(0,nullptr);
+
 	restT2.removeIndex(0,nullptr);
-	return distS(t1, t2, 0, 0) + std::min(std::min(
+
+    return distS(t1, t2, 0, 0,0) + std::min(std::min(
 		sdtw(t1, restT2),
 		sdtw(t2, restT1)),
 		sdtw(restT1, restT2));
+}*/
+
+float sdtw(Json::Value t1,Json::Value t2){
+    long n = t1.size(), m = t2.size();
+
+    std::cout<<"starting distS"<<std::endl;
+    std::vector<std::vector<float>>  dists;
+    float Max = distMAX(t1,t2);
+    for(int i=0; i<n-1;++i){
+        std::vector<float> row;
+        for(int j=0; j<m-1;++j){
+            row.push_back(distS(t1,t2,i,j,Max));
+        }
+        dists.push_back(row);
+    }
+     std::cout<<"distS done"<<std::endl;
+      std::cout<<"starting init mat"<<std::endl;
+    std::vector<std::vector<float>>  mat;
+
+    for(int i=0; i<n;++i){
+        std::vector<float> row;
+        for(int j=0; j<m;++j){
+            row.push_back(0);
+        }
+        mat.push_back(row);
+    }
+std::cout<<"init mat done"<<std::endl;
+  std::cout<<"starting  mat"<<std::endl;
+    for(int i=1; i<n-1;++i){
+        for(int j=1; j<m-1;++j){
+            mat[i][j]= dists[i][j] +std::min(mat[i-1][j-1],std::min(mat[i-1][j],mat[i][j-1]));
+        }
+    }
+std::cout<<" mat done"<<std::endl;
+    return mat[n-2][m-2];
+
 }
