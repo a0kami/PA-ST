@@ -187,6 +187,12 @@ void DisplayArea::mouseReleaseEvent(QMouseEvent *event)
 {
     //do stuff here
     isDrawing = false;
+
+    if(drawing.size() < 2) {
+        drawing.clear();
+        return;
+    }
+
     drawing.push_back({event->x() * image->width() / this->width(),
                        event->y() * image->height() / this->height()});
 

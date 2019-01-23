@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    connect(ui->frame, SIGNAL(query_added()), this, SLOT(on_query_added()));
+    connect(ui->frame, SIGNAL(query_added()), this, SLOT(when_query_added()));
 
     QString url = "data/img/camera2.png";
     image = QImage(url,"PNM");
@@ -119,9 +119,9 @@ void MainWindow::on_comboBox_distance_currentIndexChanged(int index)
     }
 }
 
-void MainWindow::on_query_added()
+void MainWindow::when_query_added()
 {
-    ui->comboBox_queries->addItem(QString::number(ui->comboBox_queries->count()));
+    ui->comboBox_queries->addItem("manuelle " + QString::number(ui->comboBox_queries->count()));
     ui->comboBox_queries->setCurrentIndex(ui->comboBox_queries->count()-1);
     on_comboBox_queries_currentIndexChanged(ui->comboBox_queries->count()-1);
 }
