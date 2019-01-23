@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 
-enum TypeDist {Dtw, Sdtw};
+enum TypeDist {Dtw, Sdtw, Hausdorff};
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -101,6 +101,9 @@ void MainWindow::on_comboBox_distance_currentIndexChanged(int index)
         calcDist = &sdtw;
         on_comboBox_queries_currentIndexChanged(ui->comboBox_queries->currentIndex());
         return;
+    case TypeDist::Hausdorff :
+        calcDist = &hausdorff;
+        on_comboBox_queries_currentIndexChanged(ui->comboBox_queries->currentIndex());
     default:
         return;
     }

@@ -116,6 +116,11 @@
                <string>SDTW</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>HAUSDORFF</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>
@@ -207,7 +212,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
