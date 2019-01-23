@@ -94,9 +94,11 @@ void MainWindow::on_comboBox_distance_currentIndexChanged(int index)
     switch(index) {
     case TypeDist::Dtw :
         calcDist = &dtw;
+        on_comboBox_queries_currentIndexChanged(ui->comboBox_queries->currentIndex());
         return;
     case TypeDist::Sdtw :
         calcDist = &sdtw;
+        on_comboBox_queries_currentIndexChanged(ui->comboBox_queries->currentIndex());
         return;
     default:
         return;
